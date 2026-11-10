@@ -40,21 +40,28 @@ module.exports = class {
     const nextarr = numarrJoin(
       numarrJoin(
         2,
-        numToNumarr4([this.config.r2mkaTime, this.config.startTime]),
+        [
+          ...numToNumarr4([this.config.r2mkaTime, this.config.startTime]),
+          ...(gv.config.adapt?.timeTail || []),
+        ],
         gv.keys[2]
       ),
       gv.config.adapt?.hasDebug ? basearrEncrypt.length >> 8 & 255 | 128 : undefined,
       basearrEncrypt,
     )
-    return '0' + numarr2string(
-      encryptMode1(
-        [
-          ...numToNumarr4(uuid(nextarr)),
-          ...nextarr
-        ],
-        numarrAddTime(gv.keys[16], this.config.runTime, this.config.random)[0],
-        1,
-        this.config.random
+    return (
+      (gv.config.adapt?.noPrefix ? '' : '0') +
+      numarr2string(
+        encryptMode1(
+          [...numToNumarr4(uuid(nextarr)), ...nextarr],
+          numarrAddTime(
+            gv.keys[16],
+            gv.config.adapt?.outerCurrentTime ? undefined : this.config.runTime,
+            this.config.random,
+          )[0],
+          1,
+          this.config.random,
+        ),
       )
     );
   }

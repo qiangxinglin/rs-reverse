@@ -3,10 +3,15 @@ const path = require('path');
 const numarrEncrypt = require('../parser/common/numarrEncrypt');
 const { simpleDecrypt, simpleEncrypt } = require('@utils/simpleCrypt');
 const logger = require('@utils/logger');
+const zxgk = require('./zxgk');
 
-const modMap = fs.readdirSync(__dirname)
-  .filter(f => f.endsWith('.js') && f !== 'index.js')
-  .map(f => require(path.join(__dirname, f)))
+const adapterModules = process.env.PCOOKIE_BUNDLE
+  ? [zxgk]
+  : fs.readdirSync(__dirname)
+      .filter((file) => file.endsWith('.js') && file !== 'index.js')
+      .map((file) => require(path.join(__dirname, file)));
+
+const modMap = adapterModules
   .reduce((ans, mod) => {
     mod.adapt?.forEach(it => {
       if (ans[it]) logger.warn(`${it}(${simpleDecrypt(it)})存在重复适配，请检查！`);

@@ -20,12 +20,13 @@ module.exports = function(numarr, keys) {
     );
   }
   if (idx < numarr.length) {
-    ans.push(
-      keys[numarr[idx] >> 2],
-      keys[(numarr[idx + 1] & 3) << 4 | numarr[idx + 1] >> 4],
-    )
-    if (numarr[idx + 1] !== undefined) {
-      ans.push(keys[(numarr[idx + 1] & 15) << 2])
+    const one = numarr[idx];
+    const two = numarr[idx + 1];
+    ans.push(keys[one >> 2]);
+    if (two !== undefined) {
+      ans.push(keys[((one & 3) << 4) | (two >> 4)], keys[(two & 15) << 2]);
+    } else {
+      ans.push(keys[(one & 3) << 4]);
     }
   }
   return ans.join('');

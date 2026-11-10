@@ -30,7 +30,7 @@ function gtHandler(str, curr) {
   }
 }
 
-const parse = (() => {
+function createTreeParser() {
   let count = 0;
   const valMap = {};
   const uids = [];
@@ -42,7 +42,7 @@ const parse = (() => {
     }
     return uid;
   }
-  return function(val, deep = 0, deeps = [0], parent = null) {
+  return function parse(val, deep = 0, deeps = [0], parent = null) {
     const str = val.taskstr;
     val.parent = parent;
     val.taskstr = str;
@@ -73,10 +73,11 @@ const parse = (() => {
       if (!key) return val;
       return valMap[key];
     }
-  }
-})();
+  };
+}
 
 exports.parse = function(str) {
+  const parseTree = createTreeParser();
   const r2mka_len = 'r2mka'.length;
   const flag = str.charAt(r2mka_len) === '1';
   const gt = gtHandler(str, r2mka_len + 1);
@@ -98,10 +99,11 @@ exports.parse = function(str) {
     }
     return ans;
   }
+
   gt.getList().concat(gt.getList()); // 未发现用处
   const windowIdx = gt.getCode(); // 首次循环入参配置，window变量存储下标
   const resourceIdx = gt.getCode(); // 首次循环如参配置，资源变量存储下标
-  return parse(deepParse());
+  return parseTree(deepParse());
 };
 
 exports.init = function(r2mkaText) {
